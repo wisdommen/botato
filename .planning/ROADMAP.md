@@ -74,8 +74,8 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 04-01-PLAN.md — Config stack (CONSUMABLE_WEIGHT + CRATE_WEIGHT sliders), crate_force.gd calculator, movement behavior wiring
-- [ ] 04-02-PLAN.md — Crate visualization color in ai_canvas.gd, crate adaptive controller registration
+- [x] 04-01-PLAN.md — Config stack (CONSUMABLE_WEIGHT + CRATE_WEIGHT sliders), crate_force.gd calculator, movement behavior wiring
+- [x] 04-02-PLAN.md — Crate visualization color in ai_canvas.gd, crate adaptive controller registration
 
 **Success Criteria** (what must be TRUE):
   1. Fruit pickup attraction, crate attraction, and boss avoidance each appear as independent arrows in the AI debug visualization
