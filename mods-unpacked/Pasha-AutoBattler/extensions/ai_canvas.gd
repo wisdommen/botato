@@ -14,7 +14,7 @@ const ENTITY_ARROW_WIDTH = 1.5
 const BOUNDARY_TYPE_INDEX = 6
 
 # Color palette indexed to calculator order in player_movement_behavior.gd
-# [0] consumable, [1] gold, [2] tree, [3] projectile, [4] enemy, [5] boss, [6] boundary
+# [0] consumable, [1] gold, [2] tree, [3] projectile, [4] enemy, [5] boss, [6] boundary, [7] crate
 var _type_colors = []
 
 
@@ -27,6 +27,7 @@ func _ready():
 		Color(1.0, 0.5, 0.0, 0.7),    # enemy: orange
 		Color(0.8, 0.0, 0.0, 0.7),    # boss: dark red
 		Color(0.7, 0.4, 1.0, 0.7),    # boundary: purple
+		Color(0.8, 0.6, 0.2, 0.7),    # crate: warm brown/tan
 	]
 
 

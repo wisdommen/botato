@@ -10,7 +10,7 @@ extends Node
 # Group assignments (D-09): defensive weights increase under threat,
 # offensive/pickup weights decrease under threat.
 const DEFENSIVE_TYPES = ["projectile", "boss", "bumper"]
-const OFFENSIVE_TYPES = ["consumable", "item", "tree"]
+const OFFENSIVE_TYPES = ["consumable", "item", "tree", "crate"]
 
 const EMA_RATE = 0.02   # D-11: ~3-second convergence at 60fps
 const MULT_MIN = 0.7    # D-10: minimum multiplier
