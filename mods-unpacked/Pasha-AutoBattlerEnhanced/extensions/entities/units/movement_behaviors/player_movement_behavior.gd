@@ -15,6 +15,7 @@ func _ready():
 		load(base + "enemy_force.gd").new(),
 		load(base + "boss_force.gd").new(),
 		load(base + "boundary_force.gd").new(),
+		load(base + "crate_force.gd").new(),
 	]
 
 
@@ -50,13 +51,14 @@ func _build_context(options) -> Dictionary:
 		"projectiles": $"/root/Main/EnemyProjectiles".get_children(),
 		"far_corner": ZoneService.current_zone_max_position,
 		"preferred_distance_sq": weapon_range * weapon_range,
-		"consumable_weight": (1.0 - (cur_hp / max_hp)) * 2.0 * ctrl.get_multiplier("consumable"),
+		"consumable_weight": (1.0 - (cur_hp / max_hp)) * 2.0 * options.consumable_weight * ctrl.get_multiplier("consumable"),
 		"item_weight": options.item_weight * ctrl.get_multiplier("item"),
 		"projectile_weight": options.projectile_weight * ctrl.get_multiplier("projectile"),
 		"tree_weight": options.tree_weight * ctrl.get_multiplier("tree"),
 		"boss_weight": options.boss_weight * ctrl.get_multiplier("boss"),
 		"bumper_weight": options.bumper_weight * ctrl.get_multiplier("bumper"),
 		"egg_weight": options.egg_weight,  # egg: NO adaptive multiplier (Pitfall 4, D-09 scope)
+		"crate_weight": options.crate_weight * ctrl.get_multiplier("crate"),
 		"bumper_distance": options.bumper_distance,
 		"is_soldier": char_name == "character_soldier",
 		"is_bull": char_name == "character_bull",
