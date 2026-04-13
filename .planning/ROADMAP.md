@@ -58,8 +58,8 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 03-01-PLAN.md — TDD: Python port of AdaptiveWeightController + comprehensive test suite
-- [ ] 03-02-PLAN.md — GDScript controller implementation + integration into autobattler_options and _build_context
+- [x] 03-01-PLAN.md — TDD: Python port of AdaptiveWeightController + comprehensive test suite
+- [x] 03-02-PLAN.md — GDScript controller implementation + integration into autobattler_options and _build_context
 
 **Success Criteria** (what must be TRUE):
   1. The damage_rate and health_ratio metrics update every frame via EMA and are readable on the AdaptiveWeightController node

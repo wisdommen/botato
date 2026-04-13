@@ -1,0 +1,106 @@
+# Requirements: Botato AI Refactor
+
+**Defined:** 2026-04-13
+**Core Value:** AI must make correct survival decisions in complex combat — proper dodging, adaptive difficulty response, fine-grained behavior control.
+
+## v1 Requirements
+
+### Algorithm Correctness (ALGO)
+
+- [ ] **ALGO-01**: Projectile avoidance uses velocity-perpendicular dodge (cross-product side selection + tangent vector), not direct flee
+- [ ] **ALGO-02**: Multi-projectile scenarios handled without force cancellation (symmetric projectile case produces valid dodge direction)
+- [ ] **ALGO-03**: Wall bumper force uses analytical 4-wall formula instead of O(n) point loop
+- [ ] **ALGO-04**: All existing hard logic bugs identified during refactoring are fixed (audit pass)
+
+### Architecture (ARCH)
+
+- [ ] **ARCH-01**: Force calculations extracted into composable calculator units (one file per force type in `forces/` directory)
+- [ ] **ARCH-02**: ForceResult contract established: each calculator returns `{vector: Vector2, debug_items: Array}`
+- [ ] **ARCH-03**: `ai_canvas.gd` reads from `_last_force_results` instead of duplicating force math
+- [ ] **ARCH-04**: Weight convention normalized across all force types (consistent sign/scale)
+- [ ] **ARCH-05**: `get_movement()` reduced to context-building + force accumulation loop (< 30 lines)
+- [ ] **ARCH-06**: Adding a new force type requires only one new file + one line in accumulation loop
+
+### Adaptive Behavior (ADAPT)
+
+- [ ] **ADAPT-01**: EMA-based performance metrics track damage_rate and health_ratio per frame
+- [ ] **ADAPT-02**: Dynamic weight multipliers adjust effective weights based on performance metrics (clamped ±30%)
+- [ ] **ADAPT-03**: Adaptive state hard-resets at wave boundaries (no carry-over between waves)
+- [ ] **ADAPT-04**: AdaptiveWeightController owned by AutobattlerOptions node (not Script Extension) to avoid _process double-call
+- [ ] **ADAPT-05**: Adaptive adjustments produce smooth transitions (lerp rate ~0.02, ~3-second convergence at 60fps)
+
+### Extensibility (EXT)
+
+- [ ] **EXT-01**: New force category: fruit/consumable attraction with configurable weight
+- [ ] **EXT-02**: New force category: crate/box attraction with configurable weight
+- [ ] **EXT-03**: New force category: boss avoidance with configurable strength (separate from generic enemy weight)
+- [ ] **EXT-04**: All new force categories have visualization support in ai_canvas
+- [ ] **EXT-05**: ModOptions UI exposes all new parameters in mod settings menu
+- [ ] **EXT-06**: Config loading uses `get_value(key, default)` fallback pattern for backward compatibility
+- [ ] **EXT-07**: `on_setting_changed()` guards new keys with `has()` check to prevent crashes on old configs
+
+## v2 Requirements
+
+### Advanced Adaptive
+
+- **ADAPT-V2-01**: Wave phase profiles (early/mid/late wave behavior shifts)
+- **ADAPT-V2-02**: Strategy presets (aggressive/defensive/balanced toggle)
+- **ADAPT-V2-03**: Character-specific adaptive profiles
+
+### Advanced Navigation
+
+- **NAV-V2-01**: Safe zone / density field finding (move toward low-threat areas)
+- **NAV-V2-02**: Predictive dodge (CPA-based trajectory estimation)
+- **NAV-V2-03**: Dodge-style toggle (perpendicular vs flee, user preference)
+
+### Character Specialization
+
+- **CHAR-V2-01**: Character-specific strategy modules (beyond Soldier/Bull special cases)
+- **CHAR-V2-02**: Weapon-aware behavior adjustment
+
+## Out of Scope
+
+| Feature | Reason |
+|---------|--------|
+| Cross-run learning / persistence | User explicitly chose in-run only; avoids file I/O complexity |
+| Multi-bot support | Previously attempted and rolled back; high complexity, unstable |
+| Item shop AI | Different domain; breaks mod's value proposition (bot moves, human chooses) |
+| ML/RL neural networks | Requires external Python training; not viable in Godot mod |
+| Context steering maps | Overkill for open-arena geometry; unnecessary complexity |
+| Strategy presets (v1) | Focus on core adaptive logic first; presets are UI sugar |
+
+## Traceability
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| ALGO-01 | Phase 1 | Pending |
+| ALGO-02 | Phase 1 | Pending |
+| ALGO-03 | Phase 1 | Pending |
+| ALGO-04 | Phase 1 | Pending |
+| ARCH-01 | Phase 1 | Pending |
+| ARCH-02 | Phase 1 | Pending |
+| ARCH-03 | Phase 2 | Pending |
+| ARCH-04 | Phase 1 | Pending |
+| ARCH-05 | Phase 1 | Pending |
+| ARCH-06 | Phase 1 | Pending |
+| ADAPT-01 | Phase 3 | Pending |
+| ADAPT-02 | Phase 3 | Pending |
+| ADAPT-03 | Phase 3 | Pending |
+| ADAPT-04 | Phase 3 | Pending |
+| ADAPT-05 | Phase 3 | Pending |
+| EXT-01 | Phase 4 | Pending |
+| EXT-02 | Phase 4 | Pending |
+| EXT-03 | Phase 4 | Pending |
+| EXT-04 | Phase 4 | Pending |
+| EXT-05 | Phase 4 | Pending |
+| EXT-06 | Phase 4 | Pending |
+| EXT-07 | Phase 4 | Pending |
+
+**Coverage:**
+- v1 requirements: 22 total
+- Mapped to phases: 22
+- Unmapped: 0 ✓
+
+---
+*Requirements defined: 2026-04-13*
+*Last updated: 2026-04-13 after roadmap creation*
