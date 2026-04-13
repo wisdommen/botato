@@ -71,6 +71,12 @@ Plans:
 **Goal**: Fruit attraction, crate attraction, and boss avoidance are live force types with visualization and ModOptions knobs, and the config system handles old save files gracefully
 **Depends on**: Phase 1, Phase 2
 **Requirements**: EXT-01, EXT-02, EXT-03, EXT-04, EXT-05, EXT-06, EXT-07
+**Plans:** 2 plans
+
+Plans:
+- [ ] 04-01-PLAN.md — Config stack (CONSUMABLE_WEIGHT + CRATE_WEIGHT sliders), crate_force.gd calculator, movement behavior wiring
+- [ ] 04-02-PLAN.md — Crate visualization color in ai_canvas.gd, crate adaptive controller registration
+
 **Success Criteria** (what must be TRUE):
   1. Fruit pickup attraction, crate attraction, and boss avoidance each appear as independent arrows in the AI debug visualization
   2. All three new force weights appear as sliders in the mod settings menu
@@ -86,5 +92,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 |-------|----------------|--------|-----------|
 | 1. Force Architecture + Algorithm Fixes | 4/4 | Complete | 2026-04-13 |
 | 2. Visualization Decoupling | 1/1 | Complete | 2026-04-13 |
-| 3. Adaptive Weight Controller | 0/2 | Not started | - |
-| 4. New Force Categories + Config | 0/? | Not started | - |
+| 3. Adaptive Weight Controller | 2/2 | Complete | 2026-04-13 |
+| 4. New Force Categories + Config | 0/2 | Not started | - |
