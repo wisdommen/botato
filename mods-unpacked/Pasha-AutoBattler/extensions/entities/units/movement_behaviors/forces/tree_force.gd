@@ -8,8 +8,7 @@ extends "res://mods-unpacked/Pasha-AutoBattler/extensions/entities/units/movemen
 # stuck against trees by repelling the player when inside half weapon range.
 # This matches original line 90: if squared_distance < (preferred_distance_squared / 2)
 #
-# D-11: The original code squared tree_weight:
-#   var tree_weight_squared = tree_weight * tree_weight
+# D-11: The original code used a squared weight pattern for tree_weight.
 # Linear replacement: ctx.tree_weight is used directly as the multiplier.
 
 func calculate(ctx: Dictionary) -> Dictionary:
