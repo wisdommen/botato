@@ -13,7 +13,7 @@ The refactor proceeds in four stages that mirror how the codebase depends on its
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Force Architecture + Algorithm Fixes** - Extract composable force calculators and fix all hard logic bugs
-- [ ] **Phase 2: Visualization Decoupling** - Decouple ai_canvas from force math by reading ForceResult contract
+- [x] **Phase 2: Visualization Decoupling** - Decouple ai_canvas from force math by reading ForceResult contract
 - [ ] **Phase 3: Adaptive Weight Controller** - Add EMA-based performance tracking and dynamic weight multipliers
 - [ ] **Phase 4: New Force Categories + Config** - Add fruit/crate/boss forces, visualization, and ModOptions exposure
 
@@ -45,7 +45,7 @@ Plans:
 **Plans:** 1 plan
 
 Plans:
-- [ ] 02-01-PLAN.md — Rewrite ai_canvas.gd as arrow-based ForceResult reader with per-type colors and boundary wall origins
+- [x] 02-01-PLAN.md — Rewrite ai_canvas.gd as arrow-based ForceResult reader with per-type colors and boundary wall origins
 
 **Success Criteria** (what must be TRUE):
   1. `ai_canvas.gd` contains no force calculation logic — all vector math is read from `_last_force_results`
@@ -80,6 +80,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Force Architecture + Algorithm Fixes | 4/4 | Complete | 2026-04-13 |
-| 2. Visualization Decoupling | 0/1 | Not started | - |
+| 2. Visualization Decoupling | 1/1 | Complete | 2026-04-13 |
 | 3. Adaptive Weight Controller | 0/? | Not started | - |
 | 4. New Force Categories + Config | 0/? | Not started | - |
