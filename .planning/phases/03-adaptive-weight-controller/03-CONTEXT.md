@@ -23,12 +23,12 @@ The AI tracks its own performance during a run and smoothly adjusts force weight
 
 ### Controller Ownership and Architecture
 - **D-05:** AdaptiveWeightController is a standalone GDScript file (not a Script Extension) instantiated as a child Node of `AutobattlerOptions`. It has its own `_process(delta)` for per-frame EMA updates. This satisfies ADAPT-04 and avoids the Script Extension double-call problem.
-- **D-06:** Instantiate the controller in `autobattler_options.gd`'s `_ready()`, following the same pattern as `main.gd` adding `AICanvas` as a child. The controller script lives at `mods-unpacked/Pasha-AutoBattler/extensions/adaptive_weight_controller.gd`.
+- **D-06:** Instantiate the controller in `autobattler_options.gd`'s `_ready()`, following the same pattern as `main.gd` adding `AICanvas` as a child. The controller script lives at `mods-unpacked/Pasha-AutoBattlerEnhanced/extensions/adaptive_weight_controller.gd`.
 - **D-07:** In Godot 3.5, `_process()` runs before `_physics_process()` each frame. The adaptive controller updates EMA in `_process()`, so fresh multipliers are available when `get_movement()` reads them during `_physics_process()`. No one-frame-stale issue.
 
 ### Weight Multiplier Integration
 - **D-08:** Apply adaptive multipliers in `_build_context()` of `player_movement_behavior.gd` when populating the context dictionary. The pattern is: `ctx.item_weight = options.item_weight * controller.get_multiplier("item")`. Base weights in `AutobattlerOptions` remain untouched — only the effective weights passed to force calculators are adjusted.
-- **D-09:** Two-group adaptation split based on damage_rate: **defensive weights** (projectile, boss, boundary) increase toward +30% when taking more damage, while **offensive/pickup weights** (consumable, gold, tree) decrease toward -30%. When damage_rate is low, the inverse occurs. This ensures the AI shifts toward survival under threat and toward collection when safe.
+- **D-09:** Two-group adaptation split based on damage_rate: **defensive weights** (projectile, boss, bumper) increase toward +30% when taking more damage, while **offensive/pickup weights** (consumable, item, tree) decrease toward -30%. When damage_rate is low, the inverse occurs. Key names match `_build_context()` dictionary keys: `gold_force.gd` uses `ctx.item_weight`, `boundary_force.gd` uses `ctx.bumper_weight`.
 - **D-10:** All multipliers clamped to [0.7, 1.3] range per ADAPT-02. The controller exposes a `get_multiplier(force_type: String) -> float` method that returns the current clamped multiplier for a given force type.
 
 ### EMA Smoothing
