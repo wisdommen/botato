@@ -24,8 +24,8 @@ AI 必须在复杂战斗场景中做出正确的生存决策 — 正确闪避弹
 
 - [ ] 硬逻辑修复：弹幕闪避应垂直于弹幕轨迹方向，而非直线后退
 - [ ] 硬逻辑修复：全面审查并修复类似的算法缺陷
-- [ ] 软逻辑：局内自适应权重系统，根据表现指标实时调节各因素权重
-- [ ] 软逻辑：自适应触发条件（存活时长、失败次数、场上威胁密度等）
+- [x] 软逻辑：局内自适应权重系统，根据表现指标实时调节各因素权重 — Validated in Phase 3
+- [x] 软逻辑：自适应触发条件（存活时长、失败次数、场上威胁密度等） — Validated in Phase 3 (EMA health_ratio + damage_rate)
 - [ ] 可控性：扩展更多可调因素（水果吸引、箱子吸引、Boss 闪避强度等）
 - [ ] 可控性：新因素的可视化支持
 - [ ] 架构重构：代码结构更健壮、简洁、可扩展
@@ -82,4 +82,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-13 after initialization*
+*Last updated: 2026-04-13 after Phase 3 completion*
