@@ -18,22 +18,22 @@ const ENABLE_SMOOTHING_OPTION_NAME = "ENABLE_SMOOTHING"
 var smoothing_speed : float = 1
 const SMOOTHING_SPEED_OPTION_NAME = "SMOOTHING_SPEED"
 
-var item_weight : float = .5
+var item_weight : float = 0.25
 const ITEM_WEIGHT_OPTION_NAME = "ITEM_WEIGHT"
 
-var projectile_weight : float = 2
+var projectile_weight : float = 4.0
 const PROJECTILE_WEIGHT_OPTION_NAME = "PROJECTILE_WEIGHT"
 
-var tree_weight : float = 2
+var tree_weight : float = 4.0
 const TREE_WEIGHT_OPTION_NAME = "TREE_WEIGHT"
 
-var boss_weight : float = 3
+var boss_weight : float = 9.0
 const BOSS_WEIGHT_OPTION_NAME = "BOSS_WEIGHT"
 
-var bumper_weight : float = 2
+var bumper_weight : float = 2.0
 const BUMPER_WEIGHT_OPTION_NAME = "BUMPER_WEIGHT"
 
-var egg_weight : float = 5
+var egg_weight : float = 25.0
 const EGG_WEIGHT_OPTION_NAME = "EGG_WEIGHT"
 
 var bumper_distance : float = 300
@@ -142,24 +142,24 @@ func load_mod_options():
 	smoothing_speed    = config.get_value(CONFIG_SECTION, SMOOTHING_SPEED_OPTION_NAME, 1)
 	mod_configs_interface.on_setting_changed(SMOOTHING_SPEED_OPTION_NAME, smoothing_speed, MOD_NAME)
 	
-	item_weight        = config.get_value(CONFIG_SECTION, ITEM_WEIGHT_OPTION_NAME, .5)
+	item_weight        = config.get_value(CONFIG_SECTION, ITEM_WEIGHT_OPTION_NAME, 0.25)
 	mod_configs_interface.on_setting_changed(ITEM_WEIGHT_OPTION_NAME, item_weight, MOD_NAME)
-	
-	projectile_weight  = config.get_value(CONFIG_SECTION, PROJECTILE_WEIGHT_OPTION_NAME, 2)
+
+	projectile_weight  = config.get_value(CONFIG_SECTION, PROJECTILE_WEIGHT_OPTION_NAME, 4.0)
 	mod_configs_interface.on_setting_changed(PROJECTILE_WEIGHT_OPTION_NAME, projectile_weight, MOD_NAME)
-	
-	tree_weight        = config.get_value(CONFIG_SECTION, TREE_WEIGHT_OPTION_NAME, 2)
+
+	tree_weight        = config.get_value(CONFIG_SECTION, TREE_WEIGHT_OPTION_NAME, 4.0)
 	mod_configs_interface.on_setting_changed(TREE_WEIGHT_OPTION_NAME, tree_weight, MOD_NAME)
-	
-	boss_weight        = config.get_value(CONFIG_SECTION, BOSS_WEIGHT_OPTION_NAME, 3)
+
+	boss_weight        = config.get_value(CONFIG_SECTION, BOSS_WEIGHT_OPTION_NAME, 9.0)
 	mod_configs_interface.on_setting_changed(BOSS_WEIGHT_OPTION_NAME, boss_weight, MOD_NAME)
-	
-	bumper_weight      = config.get_value(CONFIG_SECTION, BUMPER_WEIGHT_OPTION_NAME, 2)
+
+	bumper_weight      = config.get_value(CONFIG_SECTION, BUMPER_WEIGHT_OPTION_NAME, 2.0)
 	mod_configs_interface.on_setting_changed(BUMPER_WEIGHT_OPTION_NAME, bumper_weight, MOD_NAME)
-	
-	egg_weight         = config.get_value(CONFIG_SECTION, EGG_WEIGHT_OPTION_NAME, 5)
+
+	egg_weight         = config.get_value(CONFIG_SECTION, EGG_WEIGHT_OPTION_NAME, 25.0)
 	mod_configs_interface.on_setting_changed(EGG_WEIGHT_OPTION_NAME, egg_weight, MOD_NAME)
-	
+
 	bumper_distance    = config.get_value(CONFIG_SECTION, BUMPER_DISTANCE_OPTION_NAME, 300)
 	mod_configs_interface.on_setting_changed(BUMPER_DISTANCE_OPTION_NAME, bumper_distance, MOD_NAME)
 
@@ -190,10 +190,10 @@ func reset_defaults() -> void:
 	enable_smoothing = true
 
 	smoothing_speed = 1
-	item_weight = 0.5
-	projectile_weight = 2.0
-	tree_weight = 2.0
-	boss_weight = 3.0
+	item_weight = 0.25
+	projectile_weight = 4.0
+	tree_weight = 4.0
+	boss_weight = 9.0
 	bumper_weight = 2.0
-	egg_weight = 5.0
-	bumper_distance = 50
+	egg_weight = 25.0
+	bumper_distance = 300
