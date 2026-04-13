@@ -44,6 +44,12 @@ const EGG_WEIGHT_OPTION_NAME = "EGG_WEIGHT"
 var bumper_distance : float = 300
 const BUMPER_DISTANCE_OPTION_NAME = "BUMPER_DISTANCE"
 
+var consumable_weight : float = 1.0
+const CONSUMABLE_WEIGHT_OPTION_NAME = "CONSUMABLE_WEIGHT"
+
+var crate_weight : float = 0.5
+const CRATE_WEIGHT_OPTION_NAME = "CRATE_WEIGHT"
+
 const DEFAULT_COOLDOWN = .2
 var option_cooldown = DEFAULT_COOLDOWN
 
@@ -116,6 +122,10 @@ func setting_changed(key:String, value, mod) -> void:
 		egg_weight = value
 	elif key == BUMPER_DISTANCE_OPTION_NAME:
 		bumper_distance = value
+	elif key == CONSUMABLE_WEIGHT_OPTION_NAME:
+		consumable_weight = value
+	elif key == CRATE_WEIGHT_OPTION_NAME:
+		crate_weight = value
 	else:
 		print_debug("WARNING, UNKNOWN CHANGE ", key)
 	
@@ -170,6 +180,12 @@ func load_mod_options():
 	bumper_distance    = config.get_value(CONFIG_SECTION, BUMPER_DISTANCE_OPTION_NAME, 300)
 	mod_configs_interface.on_setting_changed(BUMPER_DISTANCE_OPTION_NAME, bumper_distance, MOD_NAME)
 
+	consumable_weight = config.get_value(CONFIG_SECTION, CONSUMABLE_WEIGHT_OPTION_NAME, 1.0)
+	mod_configs_interface.on_setting_changed(CONSUMABLE_WEIGHT_OPTION_NAME, consumable_weight, MOD_NAME)
+
+	crate_weight = config.get_value(CONFIG_SECTION, CRATE_WEIGHT_OPTION_NAME, 0.5)
+	mod_configs_interface.on_setting_changed(CRATE_WEIGHT_OPTION_NAME, crate_weight, MOD_NAME)
+
 
 func save_configs() -> void:
 	var config = ConfigFile.new()
@@ -186,7 +202,9 @@ func save_configs() -> void:
 	config.set_value(CONFIG_SECTION, BUMPER_WEIGHT_OPTION_NAME     , bumper_weight)
 	config.set_value(CONFIG_SECTION, EGG_WEIGHT_OPTION_NAME        , egg_weight)
 	config.set_value(CONFIG_SECTION, BUMPER_DISTANCE_OPTION_NAME   , bumper_distance)
-	
+	config.set_value(CONFIG_SECTION, CONSUMABLE_WEIGHT_OPTION_NAME, consumable_weight)
+	config.set_value(CONFIG_SECTION, CRATE_WEIGHT_OPTION_NAME     , crate_weight)
+
 	config.save(CONFIG_FILENAME)
 
 
@@ -204,3 +222,5 @@ func reset_defaults() -> void:
 	bumper_weight = 2.0
 	egg_weight = 25.0
 	bumper_distance = 300
+	consumable_weight = 1.0
+	crate_weight = 0.5
