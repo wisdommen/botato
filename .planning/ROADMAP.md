@@ -55,12 +55,17 @@ Plans:
 **Goal**: The AI tracks its own performance during a run and smoothly adjusts force weights in response, resetting cleanly at each wave boundary
 **Depends on**: Phase 1
 **Requirements**: ADAPT-01, ADAPT-02, ADAPT-03, ADAPT-04, ADAPT-05
+**Plans:** 2 plans
+
+Plans:
+- [ ] 03-01-PLAN.md — TDD: Python port of AdaptiveWeightController + comprehensive test suite
+- [ ] 03-02-PLAN.md — GDScript controller implementation + integration into autobattler_options and _build_context
+
 **Success Criteria** (what must be TRUE):
   1. The damage_rate and health_ratio metrics update every frame via EMA and are readable on the AdaptiveWeightController node
   2. Under sustained damage, effective weights shift within ±30% of their base values over roughly 3 seconds at 60fps
   3. At the start of each new wave, adaptive state resets to baseline with no carry-over from the previous wave
   4. AdaptiveWeightController lives on the AutobattlerOptions node, not in a Script Extension — `_process` is not called twice
-**Plans**: TBD
 
 ### Phase 4: New Force Categories + Config
 **Goal**: Fruit attraction, crate attraction, and boss avoidance are live force types with visualization and ModOptions knobs, and the config system handles old save files gracefully
@@ -81,5 +86,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 |-------|----------------|--------|-----------|
 | 1. Force Architecture + Algorithm Fixes | 4/4 | Complete | 2026-04-13 |
 | 2. Visualization Decoupling | 1/1 | Complete | 2026-04-13 |
-| 3. Adaptive Weight Controller | 0/? | Not started | - |
+| 3. Adaptive Weight Controller | 0/2 | Not started | - |
 | 4. New Force Categories + Config | 0/? | Not started | - |
