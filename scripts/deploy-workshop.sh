@@ -34,16 +34,8 @@ if [ -z "$ZIP_FILE" ]; then
     exit 1
 fi
 
-unzip -o "$ZIP_FILE" -d "$WORK_DIR/staging/"
-# Move mod contents up one level — Workshop expects manifest.json directly in contentfolder
-MOD_DIR=$(find "$WORK_DIR/staging" -name "manifest.json" -type f -exec dirname {} \; | head -1)
-if [ -z "$MOD_DIR" ]; then
-    echo "ERROR: No manifest.json found in extracted archive."
-    exit 1
-fi
-mv "$MOD_DIR"/* "$WORK_DIR/content/"
-rm -rf "$WORK_DIR/staging"
-echo "Artifact: $(basename "$ZIP_FILE") (extracted to content/)"
+cp "$ZIP_FILE" "$WORK_DIR/content/"
+echo "Artifact: $(basename "$ZIP_FILE")"
 
 # Change note
 CHANGENOTE="${1:-"Update from $(git -C "$(dirname "$0")/.." rev-parse --short HEAD)"}"
