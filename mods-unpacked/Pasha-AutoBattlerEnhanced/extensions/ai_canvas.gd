@@ -1,277 +1,132 @@
 extends Node2D
 
-func _draw():
+# Arrow-based force visualization reader
+# Consumes _last_force_results from player_movement_behavior.gd
+# Zero force calculation logic -- all data from ForceResult contract
+
+# Arrow rendering constants
+const ARROW_SCALE = 150.0
+const ARROW_MAX_LEN = 80.0
+const ARROW_MIN_LEN = 4.0
+const ARROWHEAD_SIZE = 6.0
+const SUM_ARROW_WIDTH = 3.0
+const ENTITY_ARROW_WIDTH = 1.5
+const BOUNDARY_TYPE_INDEX = 6
+
+# Color palette indexed to calculator order in player_movement_behavior.gd
+# [0] consumable, [1] gold, [2] tree, [3] projectile, [4] enemy, [5] boss, [6] boundary, [7] crate
+var _type_colors = []
+
+
+func _ready():
+	_type_colors = [
+		Color(0.2, 0.8, 0.2, 0.7),   # consumable: green
+		Color(1.0, 0.84, 0.0, 0.7),   # gold: gold/yellow
+		Color(0.0, 0.6, 0.4, 0.7),    # tree: teal
+		Color(1.0, 0.3, 0.3, 0.7),    # projectile: red
+		Color(1.0, 0.5, 0.0, 0.7),    # enemy: orange
+		Color(0.8, 0.0, 0.0, 0.7),    # boss: dark red
+		Color(0.7, 0.4, 1.0, 0.7),    # boundary: purple
+		Color(0.8, 0.6, 0.2, 0.7),    # crate: warm brown/tan
+	]
+
+
+func _draw_arrow(origin: Vector2, force_vec: Vector2, color: Color, width: float) -> void:
+	if force_vec.length_squared() < 0.0001:
+		return
+
+	var direction = force_vec.normalized()
+	var length = min(force_vec.length() * ARROW_SCALE, ARROW_MAX_LEN)
+
+	if length < ARROW_MIN_LEN:
+		return
+
+	var tip = origin + direction * length
+	draw_line(origin, tip, color, width)
+
+	# Arrowhead: two lines from tip rotated +/- 0.45 radians
+	var left = tip - (direction.rotated(0.45) * ARROWHEAD_SIZE)
+	var right = tip - (direction.rotated(-0.45) * ARROWHEAD_SIZE)
+	draw_line(tip, left, color, width)
+	draw_line(tip, right, color, width)
+
+
+func _draw_boundary_arrows(player, debug_items: Array, color: Color) -> void:
+	for item in debug_items:
+		var fv = item.force_vector
+		var abs_x = abs(fv.x)
+		var abs_y = abs(fv.y)
+		var origin = player.position
+
+		if abs_y > abs_x:
+			if fv.y > 0:
+				# Top wall pushes downward (positive y = away from y=0)
+				origin = Vector2(player.position.x, 0)
+			else:
+				# Bottom wall pushes upward
+				origin = Vector2(player.position.x, ZoneService.current_zone_max_position.y)
+		else:
+			if fv.x > 0:
+				# Left wall pushes rightward (positive x = away from x=0)
+				origin = Vector2(0, player.position.y)
+			else:
+				# Right wall pushes leftward
+				origin = Vector2(ZoneService.current_zone_max_position.x, player.position.y)
+
+		_draw_arrow(origin, item.force_vector, color, ENTITY_ARROW_WIDTH)
+
+
+func _draw() -> void:
 	var main = get_node_or_null("/root/Main")
 	if main == null:
 		return
-	if main._wave_timer.time_left < .05:
+	if main._wave_timer.time_left < 0.05:
 		return
 
-	if not get_node_or_null("/root/ModLoader") or not $"/root/ModLoader".has_node("dami-ModOptions"):
+	var options = get_node_or_null("/root/AutobattlerOptions")
+	if options == null or not options.enable_ai_visuals:
 		return
-	
-	var ModsConfigInterface = get_node("/root/ModLoader/dami-ModOptions/ModsConfigInterface")
-	
-	var visuals_enabled = ModsConfigInterface.mod_configs["Pasha-AutoBattlerEnhanced"]["ENABLE_AI_VISUALS"]
-	
-	if not visuals_enabled:
-		return
-	
+
 	var player = main._players[0]
-	var weapon_range = 1_000
-	var _entity_spawner = main.get_node("EntitySpawner")
-	var options_node = $"/root/AutobattlerOptions"
-	
-	var item_weight = options_node.item_weight
-	var projectile_weight = options_node.projectile_weight
-	var tree_weight = options_node.tree_weight
-	var boss_weight = options_node.boss_weight
-	
-	var bumper_weight = options_node.bumper_weight
-	var egg_weight = options_node.egg_weight
-	
-	var circle_size_multiplier = 1_000_000
-	var circle_max_size = 100
-	var red = Color(1, 0, 0, .6)
-	var purple = Color(1, 0, 1, .6)
-	
+
+	# Weapon range arc -- only standalone computation (not from force results)
+	var weapon_range = 1000
 	for weapon in player.current_weapons:
 		var max_range = weapon.current_stats.max_range
-		
 		if max_range < weapon_range:
 			weapon_range = max_range
-	var preferred_distance_squared = weapon_range * weapon_range
-	
 	draw_arc(player.position, weapon_range, 0, 6.28, 100, Color.red)
-	
-	# Eat consumables, weighted by missing hp
-	var max_health = float(player.max_stats.health)
-	var current_health = float(player.current_stats.health)
-	var consumable_weight = (1.0 - (current_health / max_health)) * 2
-	
-	var _consumables_container = main._consumables
-	for consumable in _consumables_container:
-		var consumable_pos = consumable.position
-		var consumable_to_player = consumable_pos - player.position
-		var squared_distance_to_consumable = consumable_to_player.length_squared()
-		
-		var size = (1 / squared_distance_to_consumable) * 10 * consumable_weight * circle_size_multiplier
-		
-		var item_circle_max = circle_max_size / 2
-		
-		if size > item_circle_max:
-			size = item_circle_max
-		
-		var to_add = (consumable_to_player.normalized() / squared_distance_to_consumable) * 10 * consumable_weight
-		if not is_nan(to_add.x) and not is_nan(to_add.y):
-			draw_circle(consumable.position, size, Color.blue)
-	
-	# Go towards "items" (gold pickups)
-	var items_container = main._active_golds
-	var item_weight_squared = item_weight * item_weight
-	for item in items_container:
-		var item_pos = item.position
-		var item_to_player = item_pos - player.position
-		var squared_distance_to_item = item_to_player.length_squared()
-		
-		var size = (1 / squared_distance_to_item) * circle_size_multiplier * item_weight
-		
-		var item_circle_max = circle_max_size / 4
-		
-		if size > item_circle_max:
-			size = item_circle_max
-		
-		var to_add = (item_to_player.normalized() / squared_distance_to_item) * item_weight_squared
-		if not is_nan(to_add.x) and not is_nan(to_add.y):
-			draw_circle(item.position, size, Color.blue)
-			
-	# Go towards "neutrals" (trees)
-	var tree_weight_squared = tree_weight * tree_weight
-	for neutral in _entity_spawner.neutrals:
-		var color = Color.blue
-		var neutral_pos = neutral.position
-		var neutral_to_player = neutral_pos - player.position
-		var squared_distance_to_neutral = neutral_to_player.length_squared()
-		
-		var to_add = (neutral_to_player.normalized() / squared_distance_to_neutral) * tree_weight_squared
-		
-		var size = (1 / squared_distance_to_neutral) * circle_size_multiplier * tree_weight
-		
-		# Weigh down nearby trees to keep from getting stuck on them
-		if squared_distance_to_neutral < (preferred_distance_squared / 2):
-			color = red
-			
-		if size > circle_max_size:
-			size = circle_max_size
 
-		if not is_nan(to_add.x) and not is_nan(to_add.y):
-			draw_circle(neutral.position, size, color)
-			
-	# Go away from projectiles
-	var projectiles_container = main.get_node("EnemyProjectiles")
-	var projectile_weight_squared = projectile_weight * projectile_weight
-	for projectile in projectiles_container.get_children():
-		if not projectile._hitbox or not projectile._hitbox.active:
-			continue
-		var projectile_shape = projectile._hitbox._collision.shape
-		var extra_range = 0
-		if projectile_shape is CircleShape2D:
-			extra_range = projectile_shape.radius
-		elif projectile_shape is RectangleShape2D:
-			extra_range = projectile_shape.extents.x
-			if projectile_shape.extents.y > extra_range:
-				extra_range = projectile_shape.extents.y
-		
-		var projectile_pos = projectile.position
-		var projectile_to_player = projectile_pos - player.position
-		var extra_range_squared = extra_range * extra_range
-		var squared_distance_to_item = projectile_to_player.length_squared() - extra_range_squared
-		if squared_distance_to_item < 0:
-			squared_distance_to_item = .001
-		
-		var size = 1 / squared_distance_to_item * 1_000_000 * projectile_weight
-		
-		var to_add = (projectile_to_player.normalized() / squared_distance_to_item) * -1 * projectile_weight_squared
-		if squared_distance_to_item > 250_000:
-			size = 0
-			to_add = Vector2.ZERO
-			
-		if size > circle_max_size:
-			size = circle_max_size
-			
-		if not is_nan(to_add.x) and not is_nan(to_add.y):
-			draw_circle(projectile.position, size, Color.red)
-			
-	# Move towards distant enemies, away from nearby ones.  Determined by weapons range.
-	var egg_weight_squared = egg_weight * egg_weight
-	
-	for enemy in _entity_spawner.enemies:
-		var color = Color.blue
-		var is_egg = enemy._attack_behavior is SpawningAttackBehavior
-		var enemy_to_player = enemy.position - player.position
-		var squared_distance_to_enemy = (enemy_to_player).length_squared()
-		
-		if circle_size_multiplier == 0:
-			continue
-		
-		var size = 1 / squared_distance_to_enemy * circle_size_multiplier
-		
-		var to_add = (enemy_to_player.normalized() / squared_distance_to_enemy)
-		if squared_distance_to_enemy < preferred_distance_squared:
-			color = red
-			to_add = to_add * -1
-			
-		if is_egg:
-			size = size * egg_weight_squared
-		
-		if size > circle_max_size:
-			size = circle_max_size
-		
-		
-		draw_circle(enemy.position, size, color)
-		
-	# Move towards distant enemies, away from nearby ones.  Determined by weapons range.
-	var boss_weight_squared = boss_weight * boss_weight
-	for boss in _entity_spawner.bosses:
-		var boss_to_player = boss.position - player.position
-		var squared_distance_to_boss = (boss_to_player).length_squared()
-		
-		var color = Color.blue
-		var size = 1 / squared_distance_to_boss * circle_size_multiplier
-		
-		var to_add = (boss_to_player.normalized() / squared_distance_to_boss) * boss_weight_squared
-		if squared_distance_to_boss < preferred_distance_squared:
-			color = red
-			to_add = to_add * -1
-			
-		if size > circle_max_size:
-			size = circle_max_size
-		
-		draw_circle(boss.position, size, color)
-		
-	var far_corner = ZoneService.current_zone_max_position
-	var bumper_x = 0
-	var bumper_distance = options_node.bumper_distance
-	var square_bumper_distance = bumper_distance * bumper_distance * 40
-	
-	while bumper_x < far_corner.x:
-		var bumper_position = Vector2(bumper_x, 0)
-		
-		var squared_distance = (bumper_position - player.position).length_squared()
-		
-		var size = 1 / squared_distance * circle_size_multiplier * bumper_weight
-		
-		if size > circle_max_size:
-			size = circle_max_size
-		
-		var to_add = (Vector2(-1,1).normalized() / squared_distance) * bumper_weight
-		if squared_distance > square_bumper_distance:
-			size = 0
-			to_add = Vector2.ZERO
-		if not is_nan(to_add.x) and not is_nan(to_add.y):
-			draw_circle(bumper_position, size, purple)
-		
-		bumper_x = bumper_x + bumper_distance
-		
-	bumper_x = 0
-	while bumper_x < far_corner.x:
-		var bumper_position = Vector2(bumper_x, far_corner.y)
-		
-		var squared_distance = (bumper_position - player.position).length_squared()
-		
-		var size = 1 / squared_distance * circle_size_multiplier * bumper_weight
-		
-		if size > circle_max_size:
-			size = circle_max_size
-		
-		var to_add = (Vector2(1,-1).normalized() / squared_distance) * bumper_weight
-		if squared_distance > square_bumper_distance:
-			size = 0
-			to_add = Vector2.ZERO
-		if not is_nan(to_add.x) and not is_nan(to_add.y):
-			draw_circle(bumper_position, size, purple)
-		
-		bumper_x = bumper_x + bumper_distance
-		
-	var bumper_y = 0
-	while bumper_y < far_corner.y:
-		var bumper_position = Vector2(0, bumper_y)
-		
-		var squared_distance = (bumper_position - player.position).length_squared()
-		
-		var size = 1 / squared_distance * circle_size_multiplier * bumper_weight
-		
-		if size > circle_max_size:
-			size = circle_max_size
-		
-		var to_add = (Vector2(1,1).normalized() / squared_distance) * bumper_weight
-		if squared_distance > square_bumper_distance:
-			size = 0
-			to_add = Vector2.ZERO
-		if not is_nan(to_add.x) and not is_nan(to_add.y):
-			draw_circle(bumper_position, size, purple)
-		
-		bumper_y = bumper_y + bumper_distance
-		
-	bumper_y = 0
-	while bumper_y < far_corner.y:
-		var bumper_position = Vector2(far_corner.x, bumper_y)
-		
-		var squared_distance = (bumper_position - player.position).length_squared()
-		
-		var size = 1 / squared_distance * circle_size_multiplier * bumper_weight
-		
-		if size > circle_max_size:
-			size = circle_max_size
-		
-		var to_add = (Vector2(-1,-1).normalized() / squared_distance) * bumper_weight
-		if squared_distance > square_bumper_distance:
-			size = 0
-			to_add = Vector2.ZERO
-		if not is_nan(to_add.x) and not is_nan(to_add.y):
-			draw_circle(bumper_position, size, purple)
-		
-		bumper_y = bumper_y + bumper_distance
+	# Find movement behavior child that holds _last_force_results
+	var movement_behavior = null
+	for child in player.get_children():
+		if "_last_force_results" in child:
+			movement_behavior = child
+			break
+
+	if movement_behavior == null:
+		return
+
+	var force_results = movement_behavior._last_force_results
+	if force_results == null or force_results.empty():
+		return
+
+	# Per-entity arrows with sum accumulation
+	var sum_vector = Vector2.ZERO
+	for i in range(force_results.size()):
+		var result = force_results[i]
+		sum_vector += result.vector
+		var color = _type_colors[i] if i < _type_colors.size() else Color.white
+
+		if i == BOUNDARY_TYPE_INDEX:
+			_draw_boundary_arrows(player, result.debug_items, color)
+		else:
+			for item in result.debug_items:
+				_draw_arrow(item.position, item.force_vector, color, ENTITY_ARROW_WIDTH)
+
+	# Composite sum arrow at player position
+	_draw_arrow(player.position, sum_vector, Color.white, SUM_ARROW_WIDTH)
+
 
 func _process(_delta):
 	update()
