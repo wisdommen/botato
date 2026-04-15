@@ -1,0 +1,32 @@
+name: Package Mod
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract version from manifest
+        id: version
+        run: |
+          VERSION=$(jq -r '.version_number' mods-unpacked/Pasha-AutoBattlerEnhanced/manifest.json)
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "MOD_VERSION=$VERSION" >> "$GITHUB_ENV"
+
+      - name: Create zip archive
+        run: cd mods-unpacked && zip -r ../Pasha-AutoBattlerEnhanced.zip Pasha-AutoBattlerEnhanced/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Pasha-AutoBattlerEnhanced-v${{ steps.version.outputs.version }}
+          path: Pasha-AutoBattlerEnhanced.zip
+          retention-days: 30
