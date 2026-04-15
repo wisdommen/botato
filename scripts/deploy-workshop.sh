@@ -34,8 +34,8 @@ if [ -z "$ZIP_FILE" ]; then
     exit 1
 fi
 
-cp "$ZIP_FILE" "$WORK_DIR/content/"
-echo "Artifact: $(basename "$ZIP_FILE")"
+unzip -o "$ZIP_FILE" -d "$WORK_DIR/content/"
+echo "Artifact: $(basename "$ZIP_FILE") (extracted)"
 
 # Change note
 CHANGENOTE="${1:-"Update from $(git -C "$(dirname "$0")/.." rev-parse --short HEAD)"}"
