@@ -1,6 +1,6 @@
 extends Node
 
-const MOD_DIR = "Pasha-AutoBattler/"
+const MOD_DIR = "Pasha-AutoBattlerEnhanced/"
 
 var dir = ""
 var ext_dir = ""

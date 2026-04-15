@@ -1,4 +1,4 @@
-extends "res://mods-unpacked/Pasha-AutoBattler/extensions/entities/units/movement_behaviors/forces/force_result.gd"
+extends "res://mods-unpacked/Pasha-AutoBattlerEnhanced/extensions/entities/units/movement_behaviors/forces/force_result.gd"
 
 # ALGO-01: Perpendicular projectile dodge with threat-aware side selection (D-01)
 # Replaces direct-flee ("projectile_to_player.normalized() * -1") with velocity-tangent dodge.

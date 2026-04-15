@@ -9,7 +9,7 @@ metadata={
 
 [deps]
 
-source_file="res://mods-unpacked/Pasha-AutoBattler/ui/defect.png"
+source_file="res://mods-unpacked/Pasha-AutoBattlerEnhanced/ui/defect.png"
 dest_files=[ "res://.import/defect.png-be5cc743c38f15111814a37561ed09f9.stex" ]
 
 [params]

@@ -1,4 +1,4 @@
-extends "res://mods-unpacked/Pasha-AutoBattler/extensions/entities/units/movement_behaviors/forces/force_result.gd"
+extends "res://mods-unpacked/Pasha-AutoBattlerEnhanced/extensions/entities/units/movement_behaviors/forces/force_result.gd"
 
 # ALGO-03: Analytical 4-wall boundary repulsion — O(1) per frame (D-04)
 # Replaces 4 O(n) sampling loops (stepping every 50px across map edges) with direct distance-to-wall.

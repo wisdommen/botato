@@ -1,6 +1,6 @@
 extends "res://ui/menus/pages/main_menu.gd"
 
-const AutobattlerOptions = preload("res://mods-unpacked/Pasha-AutoBattler/autobattler_options.gd")
+const AutobattlerOptions = preload("res://mods-unpacked/Pasha-AutoBattlerEnhanced/autobattler_options.gd")
 
 func _ready():
 	var options_node = AutobattlerOptions.new()

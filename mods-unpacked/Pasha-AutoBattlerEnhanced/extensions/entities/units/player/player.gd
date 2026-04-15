@@ -1,6 +1,6 @@
 extends "res://entities/units/player/player.gd"
 
-var ai_icon_scene = preload("res://mods-unpacked/Pasha-AutoBattler/ui/AIScene.tscn")
+var ai_icon_scene = preload("res://mods-unpacked/Pasha-AutoBattlerEnhanced/ui/AIScene.tscn")
 var ai_icon
 var ModsConfigInterface
 

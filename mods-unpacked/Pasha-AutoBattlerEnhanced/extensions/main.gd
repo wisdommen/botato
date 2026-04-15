@@ -1,6 +1,6 @@
 extends "res://main.gd"
 
-const AICanvas  = preload("res://mods-unpacked/Pasha-AutoBattler/extensions/ai_canvas.gd")
+const AICanvas  = preload("res://mods-unpacked/Pasha-AutoBattlerEnhanced/extensions/ai_canvas.gd")
 
 var canvas_layer
 

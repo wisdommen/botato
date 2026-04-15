@@ -1,4 +1,4 @@
-extends "res://mods-unpacked/Pasha-AutoBattler/extensions/entities/units/movement_behaviors/forces/force_result.gd"
+extends "res://mods-unpacked/Pasha-AutoBattlerEnhanced/extensions/entities/units/movement_behaviors/forces/force_result.gd"
 
 # Enemy attract-far/repel-near force with egg handling and context flag mutation.
 #
