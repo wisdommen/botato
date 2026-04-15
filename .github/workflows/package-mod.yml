@@ -9,6 +9,8 @@ on:
 jobs:
   package:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
 
     steps:
       - name: Checkout repository
@@ -30,3 +32,53 @@ jobs:
           name: Pasha-AutoBattlerEnhanced-v${{ steps.version.outputs.version }}
           path: Pasha-AutoBattlerEnhanced.zip
           retention-days: 30
+
+  deploy:
+    needs: package
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: Pasha-AutoBattlerEnhanced-v${{ needs.package.outputs.version }}
+          path: artifact
+
+      - name: Prepare workshop content
+        run: |
+          mkdir -p workshop/content
+          cp artifact/Pasha-AutoBattlerEnhanced.zip workshop/content/
+
+      - name: Write VDF config
+        run: |
+          cat > workshop/workshop_item.vdf <<VDFEOF
+          "workshopitem"
+          {
+              "appid"           "1942280"
+              "publishedfileid" "3707261407"
+              "contentfolder"   "${GITHUB_WORKSPACE}/workshop/content"
+              "visibility"      "2"
+              "changenote"      "Auto-deploy from ${GITHUB_SHA}"
+          }
+          VDFEOF
+
+      - name: Install SteamCMD
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq lib32gcc-s1
+          mkdir -p /tmp/steamcmd
+          curl -sL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz | tar -xz -C /tmp/steamcmd
+
+      - name: Restore Steam config
+        run: |
+          mkdir -p ~/Steam/config
+          echo "${{ secrets.STEAM_CONFIG_VDF }}" | base64 -d > ~/Steam/config/config.vdf
+
+      - name: Upload to Steam Workshop
+        run: |
+          /tmp/steamcmd/steamcmd.sh \
+            +login ${{ secrets.STEAM_USERNAME }} ${{ secrets.STEAM_PASSWORD }} \
+            +workshop_build_item ${{ github.workspace }}/workshop/workshop_item.vdf \
+            +quit
