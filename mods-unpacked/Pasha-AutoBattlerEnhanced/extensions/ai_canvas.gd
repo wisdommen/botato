@@ -1,10 +1,13 @@
 extends Node2D
 
 func _draw():
-	if $"/root/Main"._wave_timer.time_left < .05:
+	var main = get_node_or_null("/root/Main")
+	if main == null:
 		return
-	
-	if not $"/root/ModLoader".has_node("dami-ModOptions"):
+	if main._wave_timer.time_left < .05:
+		return
+
+	if not get_node_or_null("/root/ModLoader") or not $"/root/ModLoader".has_node("dami-ModOptions"):
 		return
 	
 	var ModsConfigInterface = get_node("/root/ModLoader/dami-ModOptions/ModsConfigInterface")
@@ -14,9 +17,9 @@ func _draw():
 	if not visuals_enabled:
 		return
 	
-	var player = $"/root/Main"._players[0]
+	var player = main._players[0]
 	var weapon_range = 1_000
-	var _entity_spawner = $"/root/Main/EntitySpawner"
+	var _entity_spawner = main.get_node("EntitySpawner")
 	var options_node = $"/root/AutobattlerOptions"
 	
 	var item_weight = options_node.item_weight
@@ -46,7 +49,7 @@ func _draw():
 	var current_health = float(player.current_stats.health)
 	var consumable_weight = (1.0 - (current_health / max_health)) * 2
 	
-	var _consumables_container = $"/root/Main/"._consumables
+	var _consumables_container = main._consumables
 	for consumable in _consumables_container:
 		var consumable_pos = consumable.position
 		var consumable_to_player = consumable_pos - player.position
@@ -64,7 +67,7 @@ func _draw():
 			draw_circle(consumable.position, size, Color.blue)
 	
 	# Go towards "items" (gold pickups)
-	var items_container = $"/root/Main/"._active_golds
+	var items_container = main._active_golds
 	var item_weight_squared = item_weight * item_weight
 	for item in items_container:
 		var item_pos = item.position
@@ -105,7 +108,7 @@ func _draw():
 			draw_circle(neutral.position, size, color)
 			
 	# Go away from projectiles
-	var projectiles_container = $"/root/Main/EnemyProjectiles"
+	var projectiles_container = main.get_node("EnemyProjectiles")
 	var projectile_weight_squared = projectile_weight * projectile_weight
 	for projectile in projectiles_container.get_children():
 		if not projectile._hitbox or not projectile._hitbox.active:

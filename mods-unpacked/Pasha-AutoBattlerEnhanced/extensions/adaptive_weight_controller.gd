@@ -47,7 +47,9 @@ func get_multiplier(force_type: String) -> float:
 
 
 func _process(delta):
-	var main = $"/root/Main"
+	var main = get_node_or_null("/root/Main")
+	if main == null:
+		return
 	var players = main._players
 	if players.empty():
 		return
