@@ -77,8 +77,11 @@ jobs:
           echo "${{ secrets.STEAM_CONFIG_VDF }}" | base64 -d > ~/Steam/config/config.vdf
 
       - name: Upload to Steam Workshop
+        env:
+          STEAM_USER: ${{ secrets.STEAM_USERNAME }}
+          STEAM_PASS: ${{ secrets.STEAM_PASSWORD }}
         run: |
           /tmp/steamcmd/steamcmd.sh \
-            +login ${{ secrets.STEAM_USERNAME }} ${{ secrets.STEAM_PASSWORD }} \
-            +workshop_build_item ${{ github.workspace }}/workshop/workshop_item.vdf \
+            +login "$STEAM_USER" "$STEAM_PASS" \
+            +workshop_build_item "${{ github.workspace }}/workshop/workshop_item.vdf" \
             +quit
