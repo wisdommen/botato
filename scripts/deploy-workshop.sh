@@ -47,7 +47,7 @@ cat > "$WORK_DIR/workshop_item.vdf" <<EOF
     "appid"           "$APP_ID"
     "publishedfileid" "$PUBLISHED_FILE_ID"
     "contentfolder"   "$WORK_DIR/content"
-    "visibility"      "2"
+    "visibility"      "3"
     "changenote"      "$CHANGENOTE"
 }
 EOF
