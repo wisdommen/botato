@@ -53,9 +53,13 @@ func _run_harness():
 	print("      ✓ adaptive_controller = %s" % options.adaptive_controller)
 	print("      ✓ enable_autobattler initial value: %s" % options.enable_autobattler)
 
-	# 3. Simulate Shift+Space (enable AI)
-	print("\n[3/5] Enabling autobattler (simulating Shift+Space)...")
+	# 3. Enable AI + turn on debug logger
+	print("\n[3/5] Enabling autobattler + debug logger...")
 	options.enable_autobattler = true
+	options.enable_debug_log = true
+	if options.debug_logger:
+		options.debug_logger.init_logger(true)
+		print("      ✓ debug_logger initialized, log path: %s" % options.debug_logger._path)
 	print("      ✓ enable_autobattler = %s" % options.enable_autobattler)
 
 	# 4. Attach real player_movement_behavior.gd to mock player
@@ -85,6 +89,24 @@ func _run_harness():
 	print("-" .repeat(70))
 	_run_diagnostic(movement, options, refs)
 	print("-" .repeat(70))
+
+	# 5c. Call get_movement() 65 times to exercise detailed + summary logging paths
+	print("\n[5/5c] Exercising logger (65 frames) to verify detail+summary throttling...")
+	for i in range(65):
+		movement.get_movement()
+	print("      ✓ 65 frames completed. See botato_debug.log for detail+summary.")
+
+	# Verify the log file was actually created
+	var log_path = options.debug_logger._path if options.debug_logger else ""
+	print("\n[6] Verifying log file at: %s" % log_path)
+	var f = File.new()
+	if f.file_exists(log_path):
+		f.open(log_path, File.READ)
+		var size = f.get_len()
+		f.close()
+		print("      ✓ Log file exists, size = %d bytes" % size)
+	else:
+		print("      ⚠ Log file NOT created at %s" % log_path)
 
 	print("\n" + "=" .repeat(70))
 	print("  HARNESS COMPLETE")

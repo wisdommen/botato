@@ -3,7 +3,11 @@ extends Node
 const AdaptiveWeightControllerScript = preload(
 	"res://mods-unpacked/Pasha-AutoBattlerEnhanced/extensions/adaptive_weight_controller.gd"
 )
+const BotatoLoggerScript = preload(
+	"res://mods-unpacked/Pasha-AutoBattlerEnhanced/extensions/botato_logger.gd"
+)
 var adaptive_controller  # Exposed property for _build_context() to read (D-08)
+var debug_logger          # Exposed property for diagnostics (see botato_logger.gd)
 
 signal setting_changed(setting_name, value, mod_name)
 
@@ -50,6 +54,9 @@ const CONSUMABLE_WEIGHT_OPTION_NAME = "CONSUMABLE_WEIGHT"
 var crate_weight : float = 0.5
 const CRATE_WEIGHT_OPTION_NAME = "CRATE_WEIGHT"
 
+var enable_debug_log : bool = false
+const ENABLE_DEBUG_LOG_OPTION_NAME = "ENABLE_DEBUG_LOG"
+
 const DEFAULT_COOLDOWN = .2
 var option_cooldown = DEFAULT_COOLDOWN
 
@@ -61,16 +68,29 @@ const CONFIG_SECTION = "options"
 func _ready():
 	adaptive_controller = AdaptiveWeightControllerScript.new()
 	add_child(adaptive_controller)
+
+	debug_logger = BotatoLoggerScript.new()
+	debug_logger.name = "BotatoLogger"
+	add_child(debug_logger)
+
 	reset_defaults()
 	load_mod_options()
-	
-	if not get_node("/root/ModLoader").has_node("dami-ModOptions"):
+
+	# Initialize debug logger AFTER load_mod_options so enable_debug_log reflects saved config
+	debug_logger.init_logger(enable_debug_log)
+	debug_logger.log_line("AutobattlerOptions._ready() complete")
+	debug_logger.log_kv("enable_autobattler", enable_autobattler)
+	debug_logger.log_kv("enable_debug_log", enable_debug_log)
+
+	if not get_node_or_null("/root/ModLoader") or not $"/root/ModLoader".has_node("dami-ModOptions"):
+		debug_logger.log_line("WARN: ModLoader or dami-ModOptions missing — setting_changed signals won't fire")
 		return
-	
+
 	var mod_configs_interface = get_node("/root/ModLoader/dami-ModOptions/ModsConfigInterface")
-	
+
 	if mod_configs_interface:
 		mod_configs_interface.connect("setting_changed", self, "setting_changed")
+		debug_logger.log_line("Connected to dami-ModOptions setting_changed signal")
 
 
 func _input(event):
@@ -126,9 +146,15 @@ func setting_changed(key:String, value, mod) -> void:
 		consumable_weight = value
 	elif key == CRATE_WEIGHT_OPTION_NAME:
 		crate_weight = value
+	elif key == ENABLE_DEBUG_LOG_OPTION_NAME:
+		enable_debug_log = value
+		if debug_logger:
+			debug_logger.set_enabled(value)
+			if value:
+				debug_logger.log_line("Debug log toggled ON via mod options")
 	else:
 		print_debug("WARNING, UNKNOWN CHANGE ", key)
-	
+
 	save_configs()
 
 
@@ -186,6 +212,9 @@ func load_mod_options():
 	crate_weight = config.get_value(CONFIG_SECTION, CRATE_WEIGHT_OPTION_NAME, 0.5)
 	mod_configs_interface.on_setting_changed(CRATE_WEIGHT_OPTION_NAME, crate_weight, MOD_NAME)
 
+	enable_debug_log = config.get_value(CONFIG_SECTION, ENABLE_DEBUG_LOG_OPTION_NAME, false)
+	mod_configs_interface.on_setting_changed(ENABLE_DEBUG_LOG_OPTION_NAME, enable_debug_log, MOD_NAME)
+
 
 func save_configs() -> void:
 	var config = ConfigFile.new()
@@ -204,6 +233,7 @@ func save_configs() -> void:
 	config.set_value(CONFIG_SECTION, BUMPER_DISTANCE_OPTION_NAME   , bumper_distance)
 	config.set_value(CONFIG_SECTION, CONSUMABLE_WEIGHT_OPTION_NAME, consumable_weight)
 	config.set_value(CONFIG_SECTION, CRATE_WEIGHT_OPTION_NAME     , crate_weight)
+	config.set_value(CONFIG_SECTION, ENABLE_DEBUG_LOG_OPTION_NAME , enable_debug_log)
 
 	config.save(CONFIG_FILENAME)
 
@@ -224,3 +254,4 @@ func reset_defaults() -> void:
 	bumper_distance = 300
 	consumable_weight = 1.0
 	crate_weight = 0.5
+	enable_debug_log = false

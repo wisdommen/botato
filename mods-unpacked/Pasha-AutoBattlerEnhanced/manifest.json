@@ -1,7 +1,7 @@
 {
 	"name": "AutoBattlerEnhanced",
 	"namespace": "Pasha",
-	"version_number": "2.0.0",
+	"version_number": "2.1.0",
 	"description": "Do you want to work for potatoes or do you want potatoes to work for you? Enhanced with adaptive weights and extended force categories.",
 	"website_url": "",
 	"dependencies": [],
@@ -115,6 +115,11 @@
 						"default": 0.5,
 						"tooltip": "CRATE_WEIGHT_TOOLTIP",
 						"format": "%.2f X"
+					},
+					"ENABLE_DEBUG_LOG": {
+						"type": "boolean",
+						"default": false,
+						"tooltip": "ENABLE_DEBUG_LOG_TOOLTIP"
 					}
 				}
 			}

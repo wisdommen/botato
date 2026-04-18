@@ -4,8 +4,22 @@ var _calculators = []
 var _last_force_results = []  # Phase 2 visualization reads this
 
 
+func _get_logger():
+	# Fetch BotatoLogger via AutobattlerOptions singleton. Nullable — harness and
+	# pre-ready frames may not have it yet.
+	var opts = get_node_or_null("/root/AutobattlerOptions")
+	if opts == null:
+		return null
+	return opts.debug_logger
+
+
 func _ready():
 	._ready()
+
+	# EXTENSION-LOADED SENTINEL: if this line doesn't appear in godot.log, ModLoader
+	# did NOT register this script as an extension for player_movement_behavior.
+	print("[botato ext] Enhanced player_movement_behavior._ready() called on ", self)
+
 	var base = "res://mods-unpacked/Pasha-AutoBattlerEnhanced/extensions/entities/units/movement_behaviors/forces/"
 	_calculators = [
 		load(base + "consumable_force.gd").new(),
@@ -17,6 +31,13 @@ func _ready():
 		load(base + "boundary_force.gd").new(),
 		load(base + "crate_force.gd").new(),
 	]
+	print("[botato ext] loaded ", _calculators.size(), " force calculators")
+
+	var logger = _get_logger()
+	if logger:
+		logger.log_section("player_movement_behavior._ready()")
+		logger.log_kv("calculators loaded", _calculators.size())
+		logger.log_kv("parent (player)", get_parent())
 
 
 func _compute_weapon_range(player, char_name: String, max_hp: float, cur_hp: float) -> int:
@@ -73,22 +94,63 @@ func _build_context(options) -> Dictionary:
 func get_movement() -> Vector2:
 	var options = $"/root/AutobattlerOptions"
 	var player = get_parent()
+	var logger = _get_logger()
+	var frame = 0
+	if logger:
+		frame = logger.next_frame()
 
 	if not options.enable_autobattler and not CoopService.is_bot_by_index[player.player_index]:
 		$"/root/Main/Camera".smoothing_enabled = false
+		if logger and logger.should_log_detailed():
+			logger.log_section("get_movement() frame " + str(frame) + " — AI DISABLED BRANCH")
+			logger.log_kv("enable_autobattler", options.enable_autobattler)
+			logger.log_kv("is_bot", CoopService.is_bot_by_index[player.player_index])
+			logger.log_line("returning .get_movement() [parent = base class human input]")
 		return .get_movement()
 
 	var ctx = _build_context(options)
 	_last_force_results = []
 	var move_vector = Vector2.ZERO
 
-	for calc in _calculators:
+	var detailed = logger != null and logger.should_log_detailed()
+	if detailed:
+		logger.log_section("get_movement() frame " + str(frame) + " — AI ENABLED")
+		logger.log_kv("player.position", player.position)
+		logger.log_kv("ctx.consumables.size", ctx.consumables.size())
+		logger.log_kv("ctx.golds.size", ctx.golds.size())
+		logger.log_kv("ctx.enemies.size", ctx.enemies.size())
+		logger.log_kv("ctx.bosses.size", ctx.bosses.size())
+		logger.log_kv("ctx.projectiles.size", ctx.projectiles.size())
+		logger.log_kv("ctx.neutrals.size", ctx.neutrals.size())
+		logger.log_kv("preferred_distance_sq", ctx.preferred_distance_sq)
+		logger.log_kv("item_weight (adj)", ctx.item_weight)
+		logger.log_kv("projectile_weight (adj)", ctx.projectile_weight)
+		logger.log_kv("is_soldier", ctx.is_soldier)
+
+	for i in range(_calculators.size()):
+		var calc = _calculators[i]
 		var result = calc.calculate(ctx)
 		move_vector += result.vector
 		_last_force_results.append(result)
+		if detailed:
+			logger.log_line("  calc[%d] %-25s vector=%s debug_items=%d" % [
+				i, calc.get_script().resource_path.get_file(), result.vector, result.debug_items.size()
+			])
+
+	if detailed:
+		logger.log_vec("accumulated move_vector", move_vector)
 
 	# Post-processing: Soldier freeze (D-13)
 	if ctx.is_soldier and ctx.shooting_anyone and not ctx.must_run_away:
+		if detailed:
+			logger.log_line("SOLDIER FREEZE triggered (shooting_anyone=%s must_run_away=%s) -> return ZERO" % [ctx.shooting_anyone, ctx.must_run_away])
 		return Vector2.ZERO
 
-	return move_vector.normalized()
+	var final_move = move_vector.normalized()
+	if detailed:
+		logger.log_vec("final return (normalized)", final_move)
+	elif logger and logger.should_log_summary():
+		logger.log_line("frame %d summary: move=%s len=%.4f enemies=%d projectiles=%d" % [
+			frame, str(final_move), final_move.length(), ctx.enemies.size(), ctx.projectiles.size()
+		])
+	return final_move

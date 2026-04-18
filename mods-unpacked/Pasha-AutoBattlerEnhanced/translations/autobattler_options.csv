@@ -13,6 +13,7 @@ ENABLE_AI_VISUALS,Enable AI Visualization
 ENABLE_AI_MARKER,Show AI Marker
 CONSUMABLE_WEIGHT,Consumable Weight
 CRATE_WEIGHT,Crate Weight
+ENABLE_DEBUG_LOG,Enable Debug Log
 ENABLE_AUTOBATTLER_TOOLTIP,"Enable the AutoBattler.  When activated a bot will take control of the game during the wave attempting to keep an optimals distance from enemies and projectiles."
 ENABLE_AI_VISUALS_TOOLTIP,"Enable Visualizations for the AI.  When active, elements that the bot cares about will be highlighted with bigger highlights for objects the bot cares about more."
 ENABLE_AI_MARKER_TOOLTIP,"Show a marker next to the player when the AI is Active.  This is intended for streaming and video recording when you want to highlight the fact that a human is not in control of the game."
@@ -27,3 +28,4 @@ EGG_WEIGHT_TOOLTIP,"Controls how strongly the bot will be attracted to unhatched
 BUMPER_DISTANCE_TOOLTIP,"Controls the minimum distance to a wall the bot will try to maintain."
 CONSUMABLE_WEIGHT_TOOLTIP,"Controls the base strength of fruit/consumable attraction. Higher values cause the bot to prioritize pickups more aggressively."
 CRATE_WEIGHT_TOOLTIP,"Controls how strongly the bot is attracted to item boxes (crates). Higher values cause the bot to pursue crates."
+ENABLE_DEBUG_LOG_TOOLTIP,"DIAGNOSTIC: Writes per-frame AI state to ~/botato_debug.log. Leave OFF unless asked. Log file created at your home directory ($HOME on Linux/Mac, %USERPROFILE% on Windows)."
