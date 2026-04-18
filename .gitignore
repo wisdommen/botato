@@ -22,4 +22,5 @@ cabal.project.local~
 .HTF/
 .ghc.environment.*
 .planning/
-tools/godot35/Godot_v*
+tools/
+tests/**/__pycache__/
