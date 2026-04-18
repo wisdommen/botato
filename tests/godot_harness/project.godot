@@ -1,0 +1,48 @@
+; Godot 3.5 test harness project
+; Loads the mod's GDScript against mocked Brotato classes.
+; Run with: ./tools/godot35/godot --headless --path tests/godot_harness -s test_runner.gd
+
+config_version=4
+
+_global_script_classes=[ {
+"base": "Reference",
+"class": "SpawningAttackBehavior",
+"language": "GDScript",
+"path": "res://stubs/spawning_attack_behavior.gd"
+}, {
+"base": "Reference",
+"class": "ChargingAttackBehavior",
+"language": "GDScript",
+"path": "res://stubs/charging_attack_behavior.gd"
+} ]
+_global_script_class_icons={
+"SpawningAttackBehavior": "",
+"ChargingAttackBehavior": ""
+}
+
+[application]
+
+config/name="Botato Test Harness"
+config/description="Headless GDScript runner that loads the Enhanced mod against mock Brotato classes"
+config/features=PackedStringArray("3.5")
+run/main_scene="res://test_scene.tscn"
+run/disable_stdout=false
+run/disable_stderr=false
+
+[autoload]
+
+RunData="*res://mocks/mock_run_data.gd"
+ZoneService="*res://mocks/mock_zone_service.gd"
+CoopService="*res://mocks/mock_coop_service.gd"
+ModLoader="*res://mocks/mock_mod_loader.gd"
+
+[rendering]
+
+quality/driver/driver_name="GLES2"
+threads/thread_model=0
+
+[debug]
+
+gdscript/warnings/unused_variable=false
+gdscript/warnings/unused_argument=false
+gdscript/warnings/integer_division=false
