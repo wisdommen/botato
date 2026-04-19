@@ -14,6 +14,15 @@ func _get_logger():
 
 
 func _ready():
+	# Idempotency guard: prevents double-init when player.gd force-swaps our
+	# script via set_script() + mb._ready() (issue #2 Option 3 workaround).
+	# If _calculators is already populated, our init has already run — skip
+	# base ._ready() re-entry (which could duplicate signal connections) and
+	# exit early.
+	if _calculators.size() > 0:
+		print("[botato ext] player_movement_behavior._ready() re-entry SKIPPED (already initialized)")
+		return
+
 	._ready()
 
 	# EXTENSION-LOADED SENTINEL: if this line doesn't appear in godot.log, ModLoader
