@@ -1,7 +1,7 @@
 extends Node
 
 const MOD_DIR = "Pasha-AutoBattlerEnhanced/"
-const MOD_VERSION = "2.1.3"  # keep in sync with manifest.json
+const MOD_VERSION = "2.1.4"  # keep in sync with manifest.json
 
 # Workaround for Godot 3.7-dev custom build where ModLoader 6.1's
 # GDScript.duplicate() call raises "Can't call non-static function 'duplicate'",
