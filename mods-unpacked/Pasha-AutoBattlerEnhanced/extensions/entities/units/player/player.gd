@@ -48,15 +48,30 @@ func _force_swap_movement_behavior() -> void:
 
 	var current_script = mb.get_script()
 	var current_path = "" if current_script == null else current_script.resource_path
-	print("[botato ext] movement_behavior before swap: name=", mb.name, " script=", current_path)
 
-	# Guard against double-swap if future Godot/ModLoader honors the cache refresh
-	if current_script == MovementBehaviorExt:
-		print("[botato ext] movement_behavior already using extension, no swap needed")
+	# DUAL-CRITERION guard (v2.1.3): on Godot 3.7-dev, packed-scene child nodes
+	# bake their class dispatch at pack time. Godot's cache-refresh can update
+	# the .script property (so get_script() returns the extension) WITHOUT
+	# actually routing _ready()/virtual dispatch to the extension class — the
+	# baked dispatch table still targets the base .gdc.
+	#
+	# So checking `current_script == MovementBehaviorExt` is NECESSARY but
+	# NOT SUFFICIENT. We also need a behavioral signal proving our extension's
+	# _ready() actually ran: _calculators is populated only by the extension.
+	var ext_actually_ran = current_script == MovementBehaviorExt \
+		and "_calculators" in mb \
+		and mb._calculators.size() > 0
+
+	print("[botato ext] movement_behavior before swap: name=", mb.name,
+		" script=", current_path,
+		" ext_actually_ran=", ext_actually_ran)
+
+	if ext_actually_ran:
+		print("[botato ext] extension already active, no swap needed")
 		return
 
 	mb.set_script(MovementBehaviorExt)
-	print("[botato ext] movement_behavior script swapped to extension")
+	print("[botato ext] movement_behavior script set to extension (forced)")
 
 	# Godot doesn't re-fire _ready() after set_script() on an in-tree node.
 	# Manually invoke it so our extension's init runs (loads _calculators etc).
